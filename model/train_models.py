@@ -44,18 +44,54 @@ def load_and_clean(path):
 
     return df
 
+def setup_preprocessor(df, target_col="Churn"):
+    feature_df = df.drop(columns=[target_col])
 
+    numeric_cols = feature_df.select_dtypes(include=["int64", "float64"]).columns.tolist()
+    categorical_cols = feature_df.select_dtypes(include=["object"]).columns.tolist()
+
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ("num", StandardScaler(), numeric_cols),
+            ("cat", OneHotEncoder(handle_unknown="ignore"), categorical_cols), #handle_unknown="ignore" handles crash of streamlit
+        ]
+    )
+
+    return preprocessor, numeric_cols, categorical_cols
 
 
 def main():
     print("Getting the data ready...")
     df = load_and_clean(os.path.join(OUTPUT_DIR, DATA_PATH))
 
+    X = df.drop(columns=["Churn"])
+    y = df["Churn"]
+
+    print("Splitting train/test...")
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE, stratify=y
+    )   
+
+    raw_test = X_test.copy()
+    raw_test["Churn"] = y_test.values
+    test_csv_path = os.path.join(os.path.dirname(OUTPUT_DIR), "test_data.csv")
+    raw_test.to_csv(test_csv_path, index=False)
+    print(f"Saved raw test data to {test_csv_path}")
+
+    preprocessor, numeric_cols, categorical_cols = setup_preprocessor(df)
+    X_train_proc = preprocessor.fit_transform(X_train)
+    X_test_proc = preprocessor.transform(X_test)
+
+
+   #test
     print(f"Shape: {df.shape}")
     print(f"Missing values per column:\n{df.isnull().sum()[df.isnull().sum() > 0]}")
     print(f"Churn value counts:\n{df['Churn'].value_counts()}")
     print(f"TotalCharges dtype: {df['TotalCharges'].dtype}")
-
+    print(f"Train shape: {X_train.shape}   Test shape: {X_test.shape}")
+    print(f"Numeric columns ({len(numeric_cols)}): {numeric_cols}")
+    print(f"Categorical columns ({len(categorical_cols)}): {categorical_cols}")
+    print(f"After encoding — X_train: {X_train_proc.shape}   X_test: {X_test_proc.shape}")
 
 if __name__ == "__main__":
     main()

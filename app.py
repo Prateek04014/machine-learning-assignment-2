@@ -64,11 +64,11 @@ def preprocess_input(df, preprocessor): #cleaning+transformation of data
 
 def main():
 
-    st.set_page_config(page_title="Telco Churn Classifier Demo", layout="wide")
+    st.set_page_config(page_title="Telco Churn Classifier", page_icon="📊", layout="wide")
+    st.title("📊 Telco Customer Churn — Model Comparison App")
+    st.caption("Upload test data, pick a model, and see how it performs.")
 
-    st.title("Telco Customer Churn — Model Comparison App")
-
-    st.sidebar.header("Controls")
+    st.sidebar.header("⚙️ Controls")
     uploaded_file = st.sidebar.file_uploader("Upload test CSV", type=["csv"])
     model_choice = st.sidebar.selectbox("Select a model", list(MODEL_FILES.keys()))
 
@@ -79,6 +79,8 @@ def main():
     df = pd.read_csv(uploaded_file)
     st.subheader("Preview of uploaded data")
     st.dataframe(df.head())
+    st.divider()
+    
 
     preprocessor = load_preprocessor()
     model = load_model(MODEL_FILES[model_choice])
@@ -90,8 +92,22 @@ def main():
         st.stop()
 
     y_pred = model.predict(X_proc)
+   
 
     st.subheader(f"Predictions — {model_choice}")
+
+    pred_labels = pd.Series(y_pred).map({0: "No Churn", 1: "Churn"})
+    churn_rate = (y_pred == 1).mean()
+    st.metric("Predicted Churn Rate", f"{churn_rate:.1%}")
+
+    result_preview = df.copy()
+    result_preview.insert(0, "Prediction", pred_labels.values)
+
+    if "Churn" in result_preview.columns:
+        result_preview.insert(1, "Actual", result_preview["Churn"].map({0: "No Churn", 1: "Churn", "No": "No Churn", "Yes": "Churn"}))
+        result_preview.insert(2, "Correct", result_preview["Prediction"] == result_preview["Actual"])
+
+    st.dataframe(result_preview.head(10))
 
     if y_true is not None:  #
         st.subheader("Evaluation Metrics")
@@ -141,6 +157,11 @@ def main():
             "No 'Churn' column found in the uploaded file — showing predictions only. "
             "Include the true labels to see evaluation metrics and a confusion matrix."
         )
+
+    st.sidebar.divider()
+    st.sidebar.metric("Rows Processed", len(df))
+    st.sidebar.metric("Predicted Churners", int((y_pred == 1).sum()))
+
 
 if __name__ == "__main__":
     main()

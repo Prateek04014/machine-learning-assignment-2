@@ -5,6 +5,7 @@ import joblib
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns
+import requests #live data pull button
 
 from sklearn.metrics import (
     accuracy_score,
@@ -26,6 +27,7 @@ MODEL_FILES = {
     "Naive Bayes": "naive_bayes.pkl",
     "Random Forest": "random_forest.pkl",
 }
+TEST_DATA_URL = "https://raw.githubusercontent.com/Prateek04014/machine-learning-assignment-2/main/test_data.csv"
 
 
 @st.cache_resource
@@ -35,6 +37,14 @@ def load_preprocessor():
 @st.cache_resource
 def load_model(filename):
     return joblib.load(os.path.join(MODEL_DIR, filename))
+
+@st.cache_data(ttl=300)  # re-check at most every 5 minutes
+def check_sample_data_available(url):
+    try:
+        response = requests.head(url, timeout=5)
+        return response.status_code == 200
+    except requests.RequestException:
+        return False
 
 
 def preprocess_input(df, preprocessor): #cleaning+transformation of data
@@ -69,14 +79,31 @@ def main():
     st.caption("Upload test data, pick a model, and see how it performs.")
 
     st.sidebar.header("⚙️ Controls")
+
+    if "df" not in st.session_state:
+        st.session_state.df = None
+
     uploaded_file = st.sidebar.file_uploader("Upload test CSV", type=["csv"])
+    if uploaded_file is not None:
+        st.session_state.df = pd.read_csv(uploaded_file)
+
+    sample_available = check_sample_data_available(TEST_DATA_URL)
+
+    if st.sidebar.button("📥 Load sample test data from GitHub", disabled=not sample_available):
+        st.session_state.df = pd.read_csv(TEST_DATA_URL)
+
+    if not sample_available:
+        st.sidebar.caption("⚠️ Sample data currently unavailable.")
+
     model_choice = st.sidebar.selectbox("Select a model", list(MODEL_FILES.keys()))
 
-    if uploaded_file is None:
-        st.info("Upload a test CSV to get started (e.g. test_data.csv from this repo).")
+    df = st.session_state.df
+
+    if df is None:
+        st.info("Upload a test CSV, or click 'Load sample test data from GitHub' to get started.")
         st.stop()
 
-    df = pd.read_csv(uploaded_file)
+
     st.subheader("Preview of uploaded data")
     st.dataframe(df.head())
     st.divider()

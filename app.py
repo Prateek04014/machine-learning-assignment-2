@@ -75,7 +75,7 @@ def preprocess_input(df, preprocessor): #cleaning+transformation of data
 def main():
 
     st.set_page_config(page_title="Telco Churn Classifier", page_icon="📊", layout="wide")
-    st.title("📊 Telco Customer Churn — Model Comparison App")
+    st.title("📊 Telco Customer Churn - Model Comparison App")
     st.caption("Upload test data, pick a model, and see how it performs.")
 
     st.sidebar.header("⚙️ Controls")
@@ -121,11 +121,20 @@ def main():
     y_pred = model.predict(X_proc)
    
 
-    st.subheader(f"Predictions — {model_choice}")
+    st.subheader(f"Predictions:  {model_choice}")
 
     pred_labels = pd.Series(y_pred).map({0: "No Churn", 1: "Churn"})
     churn_rate = (y_pred == 1).mean()
-    st.metric("Predicted Churn Rate", f"{churn_rate:.1%}")
+
+    if y_true is not None:
+        actual_rate = (y_true == 1).mean()
+        rate_col1, rate_col2, spacer = st.columns([1, 1, 8])
+        rate_col1.metric("Predicted Churn Rate", f"{churn_rate:.1%}")
+        rate_col2.metric("Actual Churn Rate", f"{actual_rate:.1%}", delta=f"{(churn_rate - actual_rate):+.1%}", delta_color="off")
+    else:
+        st.metric("Predicted Churn Rate", f"{churn_rate:.1%}")
+
+    st.caption("Note: closeness between predicted and actual rates doesn't guarantee correct individual predictions, see MCC and the confusion matrix below for actual accuracy.")
 
     result_preview = df.copy()
     result_preview.insert(0, "Prediction", pred_labels.values)

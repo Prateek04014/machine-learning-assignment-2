@@ -23,6 +23,32 @@ def load_model(filename):
     return joblib.load(os.path.join(MODEL_DIR, filename))
 
 
+def preprocess_input(df, preprocessor): #cleaning+transformation of data
+    df = df.copy()
+
+    if "customerID" in df.columns:
+        df = df.drop(columns=["customerID"])
+
+    if "TotalCharges" in df.columns:
+        df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
+        df["TotalCharges"] = df["TotalCharges"].fillna(df["TotalCharges"].median())
+
+    y_true = None
+    if "Churn" in df.columns: #handle both yes-no & 1-0 lables
+        if df["Churn"].dtype == object:
+            y_true = df["Churn"].map({"Yes": 1, "No": 0})
+        else:
+            y_true = df["Churn"]
+        df = df.drop(columns=["Churn"])
+
+    X_proc = preprocessor.transform(df)
+    if hasattr(X_proc, "toarray"):
+        X_proc = X_proc.toarray()
+
+    return X_proc, y_true
+
+
+
 st.set_page_config(page_title="Telco Churn Classifier Demo", layout="wide")
 
 st.title("Telco Customer Churn — Model Comparison App")
@@ -38,3 +64,12 @@ if uploaded_file is None:
 df = pd.read_csv(uploaded_file)
 st.subheader("Preview of uploaded data")
 st.dataframe(df.head())
+
+preprocessor = load_preprocessor()
+model = load_model(MODEL_FILES[model_choice])
+
+X_proc, y_true = preprocess_input(df, preprocessor)
+y_pred = model.predict(X_proc)
+
+st.subheader(f"Predictions — {model_choice}")
+st.write(y_pred[:20])  # temporary check

@@ -8,7 +8,7 @@ Being able to predict which customers are likely to leave allows a company to pr
 
 ## b. Dataset Description
 
-- **Source:** Telco Customer Churn dataset (Kaggle)(https://www.kaggle.com/datasets/blastchar/telco-customer-churn?select=WA_Fn-UseC_-Telco-Customer-Churn.csv)
+- **Source:** [Telco Customer Churn dataset](https://www.kaggle.com/datasets/blastchar/telco-customer-churn?select=WA_Fn-UseC_-Telco-Customer-Churn.csv) (Kaggle)
 - **Instances:** 7,043 customers
 - **Features:** 19 (after dropping the `customerID` identifier column)
 - **Target:** `Churn` (Yes/No — encoded to 1/0)
@@ -22,7 +22,7 @@ Being able to predict which customers are likely to leave allows a company to pr
   - Standard-scaled numeric features
   - One-hot encoded categorical features
 
-The Telco dataset had a good blend of categorical and numeric features with a good enough size (7043 rows). This gave a realistic scenario while comfortably meeting the assignment's minimum size and feature requirements.
+The Telco dataset had a good blend of categorical and numeric features with a good enough size (7043 rows). This provided a close to real life scenario while comfortably meeting minimum size and feature requirements.
 
 ## c. GitHub Repository Link
 - [Repo Link](https://github.com/Prateek04014/machine-learning-assignment-2)
@@ -60,7 +60,7 @@ machine-learning-assignment-2/
 | Random Forest (Ensemble) | 0.7750 | 0.8187 | 0.5979 | 0.4652 | 0.5233 | 0.3842 |
 
 This data also gets stored in `model/metrics_summary.csv` after running `model/train_models.py`.
-The training data and the test data are split by an 80-20 ratio with a fixed randomness of 42(to ensure repeatability)
+The training data and the test data are split by an 80-20 ratio with a fixed seed 42 (to ensure repeatability)
 
 ### Observations on Model Performance
 
@@ -73,7 +73,7 @@ The training data and the test data are split by an 80-20 ratio with a fixed ran
 | Random Forest (Ensemble) | Random Forest improves upon the decision tree by building many different decision trees and combining their predictions. Since each tree is different, errors tend to cancel out, leading to a more stable outcome that is less prone to overfitting. The biggest tradeoff for this is the lowest recall score it got (0.4652) |
 | **Overall Winner for the dataset?** | Logistic Regression seems to best fit for this dataset. Based on all the metrics, it has the highest accuracy (0.8055), the highest AUC (0.8419), Precision (0.6572) and MCC (0.4790). That said, if the business prioritises catching as many at-risk customers as possible, even at the cost of false alarms, Naive Bayes much higher Recall score (0.8369) could make it a more practical choice. |
 
-Looking across all five models, there's a clear precision-recall trade-off pattern: Naive Bayes sacrifices Precision for the highest Recall, while Random Forest does the opposite, achieving stability at the cost of the lowest Recall in the group. Logistic Regression is the only model that performs well across both, which is largely why it wins overall.
+Looking at all the above models, there seems to be a clear precision-recall tradeoff pattern emerging. Naive Bayes has the highest recall but sacrifices precision, while Random Forest is the opposite, trading stability for recall. Logistic Regression is the only model that performs well across both, which is why it wins overall.
 
 ## How to Run Locally
 
@@ -105,8 +105,8 @@ streamlit run app.py
 
 ## App Features
 
-- **One-click sample data loading** directly from this GitHub repo, with an availability check that disables the button if the file can't be reached
-- **Predicted vs. Actual churn rate comparison**, with an explicit note that closeness between the two doesn't guarantee individual-prediction accuracy (see MCC and the confusion matrix for that)
-- **Row-level Prediction / Actual / Correct columns** for direct comparison, rather than requiring the user to cross-reference separate outputs
-- **Graceful error handling** — missing required columns produce a clear error message rather than a crash; unexpected extra columns are safely ignored
-- **Classification report table** alongside the confusion matrix for a fuller per-class breakdown
+- **One-click sample data loading** directly from the repo. A check is also built-in, greying out the button if the data is not available
+- **Predicted vs. Actual churn rate comparison** shown to compare the models with more ease
+- **Row-level Prediction / Actual / Correct columns** for row level checks for each model
+- **Graceful error handling**: Wrong dataset or dataset with missing columns is handled gracefully. Extra columns are ignored
+- **Classification report table** alongside the confusion matrix to show a better breakdown

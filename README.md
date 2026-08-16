@@ -60,7 +60,9 @@ machine-learning-assignment-2/
 | Random Forest (Ensemble) | 0.7750 | 0.8187 | 0.5979 | 0.4652 | 0.5233 | 0.3842 |
 
 This data also gets stored in `model/metrics_summary.csv` after running `model/train_models.py`.
-The training data and the test data are split by an 80-20 ratio with a fixed seed 42 (to ensure repeatability)
+The training data and the test data are split by an 80-20 ratio with a fixed seed 42 (to ensure repeatability), using stratified sampling on the target variable so both sets preserve the same ~26.5% churn ratio as the full dataset.
+
+Model hyperparameters (e.g. n_neighbors=5, n_estimators=200) were set to the commonly used parameters rather than generating them via a validation set or cross validation.
 
 ### Observations on Model Performance
 

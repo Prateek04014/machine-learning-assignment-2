@@ -20,8 +20,7 @@ from sklearn.metrics import (
     recall_score,
     f1_score,
     matthews_corrcoef,
-    confusion_matrix,
-    classification_report,
+    confusion_matrix
 )
 
 #config load
@@ -153,6 +152,9 @@ def main():
     #print(f"Numeric columns ({len(numeric_cols)}): {numeric_cols}")
     #print(f"Categorical columns ({len(categorical_cols)}): {categorical_cols}")
     #print(f"After encoding — X_train: {X_train_proc.shape}   X_test: {X_test_proc.shape}")
+    #print(f"Full dataset churn rate: {(y == 1).mean():.1%}")
+    #print(f"Train set churn rate: {(y_train == 1).mean():.1%}")
+    #print(f"Test set churn rate: {(y_test == 1).mean():.1%}")
 
 if __name__ == "__main__":
     main()

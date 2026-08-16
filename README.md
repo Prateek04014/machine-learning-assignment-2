@@ -1,4 +1,4 @@
-# Telco Customer Churn — Classification Model Comparison
+# Telco Customer Churn - Classification Model Comparison
 
 ## a. Problem Statement
 
@@ -11,7 +11,7 @@ Being able to predict which customers are likely to leave allows a company to pr
 - **Source:** [Telco Customer Churn dataset](https://www.kaggle.com/datasets/blastchar/telco-customer-churn?select=WA_Fn-UseC_-Telco-Customer-Churn.csv) (Kaggle)
 - **Instances:** 7,043 customers
 - **Features:** 19 (after dropping the `customerID` identifier column)
-- **Target:** `Churn` (Yes/No — encoded to 1/0)
+- **Target:** `Churn` (Yes/No - encoded to 1/0)
 - **Feature types:** Mix of numeric (`tenure`, `MonthlyCharges`, `TotalCharges`) and
   categorical (`gender`, `Contract`, `InternetService`, `PaymentMethod`, etc.)
 - **Class balance:** ~26.5% churn, ~73.5% no-churn (moderately imbalanced)
@@ -62,7 +62,7 @@ machine-learning-assignment-2/
 This data also gets stored in `model/metrics_summary.csv` after running `model/train_models.py`.
 The training data and the test data are split by an 80-20 ratio with a fixed seed 42 (to ensure repeatability), using stratified sampling on the target variable so both sets preserve the same ~26.5% churn ratio as the full dataset.
 
-Model hyperparameters (e.g. n_neighbors=5, n_estimators=200) were set to the commonly used parameters rather than generating them via a validation set or cross validation.
+Model hyperparameters (e.g. n_neighbors=5, n_estimators=200) were set to the commonly used parameters rather than tuning them via a validation set or cross validation.
 
 ### Observations on Model Performance
 
